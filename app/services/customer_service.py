@@ -59,5 +59,6 @@ class CustomerService:
 
     async def delete_customer(self, customer_id: uuid.UUID) -> None:
         customer = await self.get_customer(customer_id)
-        await self._customer_dao.soft_delete(customer)
+        customer.mark_deleted()
+        await self._customer_dao.save(customer)
         await self._session.commit()

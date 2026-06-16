@@ -1,5 +1,4 @@
 import uuid
-from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -41,8 +40,3 @@ class CustomerDAO:
         )
         result = await self._session.scalars(statement)
         return result.one_or_none()
-
-    async def soft_delete(self, customer: Customer) -> Customer:
-        customer.deleted_at = datetime.now(UTC)
-        await self._session.flush()
-        return customer

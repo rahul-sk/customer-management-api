@@ -1,6 +1,6 @@
 import enum
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 from sqlalchemy import Date, DateTime, Enum, Integer, String, func
 from sqlalchemy.dialects.postgresql import UUID
@@ -46,3 +46,6 @@ class Customer(Base):
         nullable=True,
     )
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    def mark_deleted(self) -> None:
+        self.deleted_at = datetime.now(UTC)
