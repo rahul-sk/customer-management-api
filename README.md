@@ -11,8 +11,6 @@ FastAPI backend for the Customer Management API take-home task.
 - Pydantic v2
 - PostgreSQL
 
-Docker is intentionally left for a later pass.
-
 ## Local Setup
 
 1. Create and activate a virtual environment.
@@ -47,6 +45,25 @@ uvicorn app.main:app --reload
 ```
 
 The interactive API docs are available at `http://localhost:8000/docs`.
+
+## Docker Setup
+
+Create `.env` if you have not already done so, then build and start the API with PostgreSQL.
+
+```bash
+cp .env.example .env
+```
+
+```bash
+docker-compose up --build
+```
+
+The API runs at `http://localhost:8000`, and the interactive docs are available at
+`http://localhost:8000/docs`.
+
+The Compose setup reads credentials from `.env`, injects environment variables into both
+services, waits for PostgreSQL to be healthy before starting the API, and persists database
+data in the `postgres_data` volume.
 
 ## Endpoints
 

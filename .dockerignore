@@ -1,0 +1,13 @@
+.DS_Store
+.env
+.env.docker
+.git
+.pytest_cache
+.ruff_cache
+.venv
+.pycache
+__pycache__
+*.egg-info
+*.pyc
+outputs
+work
