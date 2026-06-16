@@ -61,6 +61,8 @@ The interactive API docs are available at `http://localhost:8000/docs`.
 - DAO classes contain database queries only.
 - Service classes contain business logic only.
 - Credentials are loaded from `.env` and are not hardcoded.
+- Database connection timeout, PostgreSQL statement timeout, and pool limits are configured
+  through `.env`.
 
 ## Common Local PostgreSQL Issue
 
