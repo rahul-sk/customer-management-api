@@ -7,28 +7,20 @@ from app.core.exceptions import CustomerNotFoundError, DuplicateEmailError
 from app.dao.customer_dao import CustomerDAO
 from app.models.customer import Customer
 from app.schemas.customer import CustomerCreate, CustomerUpdate
+from app.services.customer_factory import CustomerFactory
+from app.services.customer_validator import CustomerValidator
 
 
 class CustomerService:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
         self._customer_dao = CustomerDAO(session)
+        self._customer_factory = CustomerFactory()
+        self._customer_validator = CustomerValidator(self._customer_dao)
 
     async def create_customer(self, payload: CustomerCreate) -> Customer:
-        existing_customer = await self._customer_dao.get_by_email(payload.email)
-        if existing_customer is not None:
-            raise DuplicateEmailError("A customer with this email already exists.")
-
-        customer = Customer(
-            first_name=payload.first_name,
-            last_name=payload.last_name,
-            email=payload.email,
-            phone_number=payload.phone_number,
-            date_of_birth=payload.date_of_birth,
-            address=payload.address,
-            account_status=payload.account_status,
-            credit_score=payload.credit_score,
-        )
+        await self._customer_validator.ensure_email_available(payload.email)
+        customer = self._customer_factory.create_from_payload(payload)
 
         try:
             saved_customer = await self._customer_dao.save(customer)
@@ -52,13 +44,9 @@ class CustomerService:
         customer = await self.get_customer(customer_id)
 
         if payload.email is not None and payload.email != customer.email:
-            existing_customer = await self._customer_dao.get_by_email(payload.email)
-            if existing_customer is not None and existing_customer.id != customer_id:
-                raise DuplicateEmailError("A customer with this email already exists.")
+            await self._customer_validator.ensure_email_available(payload.email, customer_id)
 
-        update_data = payload.model_dump(exclude_unset=True)
-        for field_name, value in update_data.items():
-            setattr(customer, field_name, value)
+        self._customer_factory.apply_update(customer, payload)
 
         try:
             saved_customer = await self._customer_dao.save(customer)
